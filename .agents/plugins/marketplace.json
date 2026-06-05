@@ -1,0 +1,20 @@
+{
+  "name": "oh-story-plugins",
+  "interface": {
+    "displayName": "Oh Story Plugins"
+  },
+  "plugins": [
+    {
+      "name": "oh-story-claudecode",
+      "source": {
+        "source": "local",
+        "path": "./plugins/oh-story-claudecode"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Writing"
+    }
+  ]
+}

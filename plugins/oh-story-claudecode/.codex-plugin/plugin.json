@@ -1,0 +1,40 @@
+{
+  "name": "oh-story-claudecode",
+  "version": "0.6.14",
+  "description": "网络小说创作技能包，兼容 Claude Code/OpenClaw，并提供 Codex 插件入口。",
+  "author": {
+    "name": "worldwonderer",
+    "url": "https://github.com/worldwonderer"
+  },
+  "homepage": "https://github.com/worldwonderer/oh-story-claudecode",
+  "repository": "https://github.com/worldwonderer/oh-story-claudecode",
+  "license": "MIT",
+  "keywords": [
+    "novel-writing",
+    "web-novel",
+    "story",
+    "chinese",
+    "codex-skill",
+    "claude-code-skill"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Oh Story",
+    "shortDescription": "中文网文创作全流程技能包",
+    "longDescription": "在不改动原有 skill 内容的前提下，为 oh-story-claudecode 增加 Codex 插件入口；继续保留 Claude Code/OpenClaw 安装方式，并让 Codex 可直接发现 skills/ 下的扫榜、拆文、写作、审查、去 AI 味、导入和封面生成流程。",
+    "developerName": "worldwonderer",
+    "category": "Writing",
+    "capabilities": [
+      "Interactive",
+      "Write",
+      "Research"
+    ],
+    "websiteURL": "https://github.com/worldwonderer/oh-story-claudecode",
+    "defaultPrompt": [
+      "使用 $story 判断这次网文任务该走哪个流程。",
+      "使用 $story-long-write 帮我规划一部长篇网文。",
+      "使用 $story-deslop 帮我把这段草稿改得更自然。"
+    ],
+    "brandColor": "#7C3AED"
+  }
+}

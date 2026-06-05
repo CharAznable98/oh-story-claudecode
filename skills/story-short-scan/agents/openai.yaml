@@ -1,0 +1,4 @@
+interface:
+  display_name: "Short Story Scan"
+  short_description: "分析短篇平台榜单、风口题材、传播情绪与机会"
+  default_prompt: "使用 $story-short-scan 扫描短篇网文市场趋势。"
