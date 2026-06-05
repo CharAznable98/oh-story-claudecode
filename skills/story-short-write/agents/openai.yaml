@@ -1,0 +1,4 @@
+interface:
+  display_name: "Short Story Write"
+  short_description: "辅助短篇构思、分节写作、成稿与精修定稿"
+  default_prompt: "使用 $story-short-write 写一篇短篇网文。"
