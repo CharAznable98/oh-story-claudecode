@@ -12,24 +12,23 @@
 2. repo/team 级 marketplace 放在 `$REPO_ROOT/.agents/plugins/marketplace.json`。
 3. marketplace 的每个 `plugins[]` 条目应让 `source.path` 指向插件目录，并使用以 `./` 开头、相对 marketplace root 的路径。
 4. CLI 安装 marketplace 使用 `codex plugin marketplace add owner/repo`；本地目录可用 `codex plugin marketplace add ./local-marketplace-root`。
-5. 当前 Codex 对 marketplace `source.path: "./"` 指向仓库根的支持并不稳妥，因此本仓库不把 plugin 放在 repo root，而是放入 `plugins/oh-story-claudecode/`。
+5. 本仓库选择把 **仓库根目录本身作为 plugin folder**：`.agents/plugins/marketplace.json` 的 `source.path` 指向 `./`，根目录 `.codex-plugin/plugin.json` 再通过 `skills: "./skills/"` 直接复用已有 skill 树。
 
 ## 设计目标
 
-1. **使用官方 plugin 形态**：提供 `.agents/plugins/marketplace.json` 和 `plugins/oh-story-claudecode/.codex-plugin/plugin.json`。
+1. **使用官方 plugin 形态**：提供 `.agents/plugins/marketplace.json` 和 `.codex-plugin/plugin.json`。
 2. **不改动原 skill 内容**：`skills/*/SKILL.md` 与引用资料保持原样，避免为了 Codex 适配而改写技能正文。
-3. **单一技能来源**：Codex plugin 通过 `plugins/oh-story-claudecode/skills -> ../../skills` 指向仓库根 `skills/`，避免复制两份 skill 内容。
-4. **双入口并存**：Claude Code / OpenClaw 继续读取 `.claude-plugin/marketplace.json`；Codex 读取 `.agents/plugins/marketplace.json` 和插件 manifest。
+3. **单一技能来源**：Codex plugin 直接使用仓库根目录 `skills/`，不使用符号链接，也不复制 `skills/` 到 `plugins/` 子目录，避免远程 cache 空目录和双份维护问题。
+4. **双入口并存**：Claude Code / OpenClaw 继续读取 `.claude-plugin/marketplace.json`；Codex 读取 `.agents/plugins/marketplace.json` 和根目录插件 manifest。
 5. **可验证**：`scripts/smoke-test-codex-compat.sh` 会验证 marketplace、plugin manifest、skill 发现和每个 skill 的 Codex 元数据。
 
 ## 当前仓库结构
 
 ```text
 .claude-plugin/marketplace.json                 # Claude Code / OpenClaw 入口，保留不变
-.agents/plugins/marketplace.json                # Codex repo marketplace
-plugins/oh-story-claudecode/.codex-plugin/      # Codex plugin manifest
-plugins/oh-story-claudecode/skills -> ../../skills
-skills/                                         # 单一 skill 正文来源
+.agents/plugins/marketplace.json                # Codex repo marketplace，指向 ./
+.codex-plugin/plugin.json                       # Codex repo-root plugin manifest
+skills/                                         # 唯一 skill 正文来源
 skills/*/agents/openai.yaml                     # Codex skill 展示/发现元数据
 scripts/smoke-test-codex-compat.sh              # Codex plugin 兼容性烟测
 ```
@@ -74,15 +73,15 @@ bash scripts/smoke-test-codex-compat.sh
 
 该检查会验证：
 
-- `.agents/plugins/marketplace.json` 是合法 JSON，且指向 `./plugins/oh-story-claudecode`。
-- `plugins/oh-story-claudecode/.codex-plugin/plugin.json` 是合法 JSON，且 `skills` 为 `./skills/`。
+- `.agents/plugins/marketplace.json` 是合法 JSON，且指向仓库根目录 `./`。
+- `.codex-plugin/plugin.json` 是合法 JSON，且 `skills` 为 `./skills/`。
 - plugin 路径下能发现每个预期 skill 的 `SKILL.md`。
 - 每个 `SKILL.md` 至少包含 Codex/Claude 都需要的 `name` 和 `description` frontmatter。
 - 每个预期 skill 目录都有 `agents/openai.yaml`，且包含 Codex UI 需要的 `interface.display_name`、`short_description` 和 `default_prompt`。
 
 ## 已知边界
 
-- `plugins/oh-story-claudecode/skills` 使用符号链接指向根 `skills/`，以满足官方插件目录形态并避免维护两份 skill 内容。若未来要发布不依赖 symlink 的归档包，可在发布流程中物化复制该目录。
+- 该方案依赖 Codex 支持 marketplace `source.path: "./"` 指向 marketplace 仓库根目录；这样安装 cache 会包含根目录真实 `skills/`，不会出现子目录 symlink 目标丢失的问题。
 - `story-setup` 的正文仍以 Claude Code 项目初始化为主，会生成 `.claude/`、`CLAUDE.md` 和 Claude hooks。为了遵守「不改动原 skill 内容」，本次不把它改写为 Codex 项目初始化器。
 - Codex 多代理委派语义与 Claude subagent 注册不同；现有审查/探索类说明可作为方法论参考，但不在本次最小兼容层中强行转换。
 - `agents/openai.yaml` 只解决 Codex 侧 skill 展示/发现问题，不等同于把 `story-setup` 部署出的 Claude subagent 模板转换为 Codex 原生 agent。

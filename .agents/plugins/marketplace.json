@@ -8,7 +8,7 @@
       "name": "oh-story-claudecode",
       "source": {
         "source": "local",
-        "path": "./plugins/oh-story-claudecode"
+        "path": "./"
       },
       "policy": {
         "installation": "AVAILABLE",

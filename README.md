@@ -87,13 +87,11 @@ npx skills add worldwonderer/oh-story-claudecode -y -g
 
 `-g` 全局安装，所有目录可用；去掉 `-g` 则只装到当前目录。更新时重新执行同一条命令即可。
 
-**Codex 官方 Plugin 接入**：仓库提供 `.agents/plugins/marketplace.json`，按 Codex 官方 marketplace/plugin 形式暴露 `oh-story-claudecode` 插件。安装方式：
+**Codex 安装**：
 
 ```bash
 codex plugin marketplace add worldwonderer/oh-story-claudecode
 ```
-
-本地调试可在仓库根目录执行 `codex plugin marketplace add .`，然后重启 Codex，在 `/plugins` 中安装并启用 Oh Story。更多设计取舍见 [Codex 兼容方案](docs/CODEX_COMPATIBILITY.md)。
 
 > 升级后如果项目里已经跑过 `/story-setup`，建议在项目根重跑一次 `/story-setup`，同步 hooks / agents / references。每版变更见 [CHANGELOG.md](CHANGELOG.md) 与 [Releases](https://github.com/worldwonderer/oh-story-claudecode/releases)。
 

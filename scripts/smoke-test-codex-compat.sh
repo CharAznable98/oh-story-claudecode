@@ -5,7 +5,7 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MARKETPLACE_JSON="$REPO_ROOT/.agents/plugins/marketplace.json"
-PLUGIN_DIR="$REPO_ROOT/plugins/oh-story-claudecode"
+PLUGIN_DIR="$REPO_ROOT"
 PLUGIN_JSON="$PLUGIN_DIR/.codex-plugin/plugin.json"
 PLUGIN_SKILLS_DIR="$PLUGIN_DIR/skills"
 
@@ -73,10 +73,12 @@ source = entry.get("source")
 if not isinstance(source, dict) or source.get("source") != "local":
     raise SystemExit("Error: marketplace source must be a local source object")
 source_path = source.get("path")
-if source_path != "./plugins/oh-story-claudecode":
-    raise SystemExit("Error: marketplace source.path must point at ./plugins/oh-story-claudecode")
-if not (repo_root / source_path).resolve().is_dir():
-    raise SystemExit("Error: marketplace source.path does not resolve to a plugin directory")
+if source_path != "./":
+    raise SystemExit("Error: marketplace source.path must point at repo root ./")
+if (repo_root / source_path).resolve() != plugin_dir:
+    raise SystemExit("Error: marketplace source.path does not resolve to the repo-root plugin directory")
+if not (plugin_dir / ".codex-plugin" / "plugin.json").is_file():
+    raise SystemExit("Error: repo-root plugin directory must contain .codex-plugin/plugin.json")
 for key in ["policy", "category"]:
     if key not in entry:
         raise SystemExit(f"Error: marketplace plugin entry missing {key}")
@@ -88,13 +90,16 @@ if missing:
 
 skills_value = manifest["skills"]
 if skills_value != "./skills/":
-    raise SystemExit("Error: plugin.json skills must be ./skills/ for official plugin packaging")
+    raise SystemExit("Error: plugin.json skills must be ./skills/ for repo-root plugin packaging")
 
-skills_dir = (plugin_dir / skills_value).resolve()
+raw_skills_dir = plugin_dir / skills_value
+if raw_skills_dir.is_symlink():
+    raise SystemExit("Error: plugin skills path must be the real repo skills directory, not a symlink")
+skills_dir = raw_skills_dir.resolve()
+if skills_dir != (repo_root / "skills").resolve():
+    raise SystemExit(f"Error: plugin skills path must resolve to repo skills/: {skills_dir}")
 if not skills_dir.is_dir():
     raise SystemExit(f"Error: plugin.json skills path does not exist: {skills_dir}")
-if repo_root not in [skills_dir, *skills_dir.parents]:
-    raise SystemExit(f"Error: plugin skills path escapes repo: {skills_dir}")
 
 interface = manifest["interface"]
 for key in ["displayName", "shortDescription", "defaultPrompt"]:
@@ -132,4 +137,4 @@ for name in "${expected_skills[@]}"; do
   done
 done
 
-echo "Codex plugin smoke test passed: marketplace -> plugin -> ${#expected_skills[@]} skills"
+echo "Codex plugin smoke test passed: marketplace -> repo-root plugin -> ${#expected_skills[@]} skills"
