@@ -89,13 +89,11 @@ npx skills add worldwonderer/oh-story-claudecode -y -g
 
 `-g` installs globally (available in every directory); drop `-g` to install only into the current directory. Re-run the same command to update.
 
-**Official Codex plugin entry**: this repository ships `.agents/plugins/marketplace.json`, exposing `oh-story-claudecode` through Codex's official marketplace/plugin flow. Install it with:
+**Codex install**:
 
 ```bash
 codex plugin marketplace add worldwonderer/oh-story-claudecode
 ```
-
-For local testing from the repository root, run `codex plugin marketplace add .`, restart Codex, then install and enable Oh Story from `/plugins`. See [Codex Compatibility](docs/CODEX_COMPATIBILITY.md) for the design trade-offs.
 
 > After updating, if a project has already run `/story-setup`, re-run `/story-setup` from the project root to sync hooks / agents / references. Per-version changes are in [CHANGELOG.md](CHANGELOG.md) and [Releases](https://github.com/worldwonderer/oh-story-claudecode/releases).
 
